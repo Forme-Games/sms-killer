@@ -2,7 +2,7 @@
 
 git clone https://github.com/Forme-Games/sms-killer/
 
-cd vk-killer 
+cd sms-killer 
 
 chmod +x install.sh
 
