@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+
+import os
+
+os.system("printf '\033]2;sms-killer\a'")
+
+import argparse
+import sys
+import signal
+
+def signal_handler(signal, frame):
+    A = '\033[1;33m'
+    W = '\033[0m'
+    E = '\033[0m'
+    print(A+'\n[!]'+W+' Attack terminated.'+E)
+    os._exit(0)
+
+
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--target", type = str, metavar = "<phone>",
+					help = "Target IP and port, URL or phone.")
+	parser.add_argument("--tool", type = str, metavar = "[SMS]",
+					help = "Attack tool.")
+	parser.add_argument("--timeout", type = int, default = 10, metavar = "<timeout>",
+					help = 'Timeout in seconds.')
+	parser.add_argument("--threads", type = int, default = 3, metavar = "<threads>",
+					help = "Threads count.")
+	parser.add_argument("-u", "--update", action='store_true', dest="update", help = "Update Quack Toolkit.")
+	parser.add_argument("--version", action='store_true', dest="version", help = "Show Quack Toolkt version.")
+
+	# Get args
+	args = parser.parse_args()
+	threads = args.threads
+	time = args.timeout
+	method = str(args.tool).upper()
+	target = args.target
+
+	if method == "SMS":
+		signal.signal(signal.SIGINT, signal_handler)
+		import tools.addons.clean
+		import tools.addons.logo
+		from tools.SMS.main import SMS_ATTACK
+		SMS_ATTACK(threads, time, target)
+		
+	elif args.update:
+		os.system("chmod +x bin/sms-killer && bin/sms-killer -u")
+		sys.exit()
+
+	elif args.version:
+		print("")
+		os.system("cat banner/banner.txt")
+		print("")
+		sys.exit()
+
+
+	else:
+		parser.print_help()
+
+if __name__ == '__main__':
+	main()

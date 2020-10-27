@@ -1,0 +1,96 @@
+#!/bin/bash
+
+printf '\033]2;sms-killer\a'
+
+G="\033[1;34m[*] \033[0m"
+S="\033[1;32m[+] \033[0m"
+E="\033[1;31m[-] \033[0m"
+
+if [[ "$1" = "-u" || "$1" = "--update" ]]
+then
+if [[ -d /data/data/com.termux ]]
+then
+if [[ -f /data/data/com.termux/files/usr/bin/sms-killer ]]
+then
+UPD="true"
+else
+UPD="false"
+fi
+else
+if [[ -f /usr/local/bin/sms-killer ]]
+then
+UPD="true"
+else
+UPD="false"
+fi
+fi
+{
+ASESR="$(ping -c 1 -q www.google.com >&/dev/null; echo $?)"
+} &> /dev/null
+if [[ "$ASESR" != 0 ]]
+then 
+   echo -e ""$E"No Internet connection!"
+   exit
+fi
+if [[ $(id -u) != 0 ]]
+then
+   echo -e ""$E"Permission denied!"
+   exit
+fi
+sleep 1
+echo -e ""$G"Installing update..."
+{
+rm -rf ~/sms-killer
+rm /bin/sms-killer
+rm /usr/local/bin/sms-killer
+rm /data/data/com.termux/files/usr/bin/sms-killer
+cd ~
+git clone https://github.com/Forme-Games/sms-killer.git
+if [[ "$UPD" != "true" ]]
+then
+sleep 0
+else
+cd ~/sms-killer
+chmod +x install.sh
+./install.sh
+fi
+} &> /dev/null
+if [[ ! -d ~/sms-killer ]]
+then
+   echo -e ""$E"Installation failed!"
+   exit
+fi
+echo -e ""$S"Successfully updated!"
+sleep 1
+exit
+fi
+
+if [[ -d ~/sms-killer ]]
+then
+cd ~/sms-killer
+chmod +x sms-killer
+./sms-killer $1 $2 $3 $4 $5 $6 $7 $8 $9
+else
+{
+ASESR="$(ping -c 1 -q www.google.com >&/dev/null; echo $?)"
+} &> /dev/null
+if [[ "$ASESR" = 0 ]]
+then 
+cd ~
+{
+git clone https://github.com/Forme-Games/sms-killer.git
+cd $OLDPWD
+cd ~/sms-killer
+} &> /dev/null
+if [[ ! -d ~/sms-killer ]]
+then
+   echo -e ""$E"Execution failed!"
+   exit
+fi
+chmod +x sms-killer
+./sms-killer $1 $2 $3 $4 $5 $6 $7 $8 $9
+else
+echo -e ""$E"Execution failed!"
+exit
+fi
+fi
